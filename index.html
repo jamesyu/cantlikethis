@@ -1,0 +1,184 @@
+<html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>I Bet You Can't Like This</title>
+    
+        
+        <script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+        <script src="fx.js"></script>
+        
+        <style>
+            body {
+                text-align: center;
+                font-family: Helvetica;
+                padding-top: 20px;
+                background: url(stripe.png);
+            }
+            
+            #page {
+                width: 600px;
+                background: #fff;
+                margin :auto;
+                padding: 25px;
+                border: 5px solid #7692CC;
+                -moz-box-shadow: 0px 0px 25px #ddd;
+                box-shadow: 0px 0px 25px #ddd;
+            }
+            
+            .container {
+                margin: auto;
+                width: 600px;
+                height: 400px;
+                position: relative;
+                border: 5px solid #ddd;
+            }
+            
+            h1 {
+                background: #0000CC;
+                padding: 10px;
+                color: #fff;
+                width: 400px;
+                margin: auto;
+                -moz-border-radius: 10px;
+                -webkit-border-radius: 10px;
+            }
+            
+            h2 {
+                color: #777;
+
+            }
+        
+            #like {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+            
+            #done {
+                text-align: center;
+            }
+            
+            #done p {
+                margin-top: 100px;
+                font-size: 50px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="page">
+            <h1>Can't Like This</h1>
+        
+            <h2>Beat your friends best time: 3 seconds</h2>
+        
+            <div class="container" id="play">
+                <div id="like">
+                    <fb:like href="http://www.cantlikethis.com"></fb:like>
+                </div>
+            </div>
+            
+            <div class="container" style="display:none" id="done">
+                <p>It took you <span id="time_diff"></span> seconds.</p>
+                <p><a href="/">Refresh</a> to try again.</p>
+            </div>
+        </div>
+        
+        <div id="fb-root"></div>
+        <script>
+        
+        
+        	function GetCurrentTime() {
+        	var my_current_timestamp;
+        		my_current_timestamp = new Date();		//stamp current date & time
+        		return my_current_timestamp.getTime();
+        	}
+
+            var start = GetCurrentTime();
+        
+            window.fbAsyncInit = function() {
+                FB.init({appId: '121798854535380', status: true, cookie: true,
+                         xfbml: true});
+                         
+                         
+                FB.Event.subscribe('edge.create', function(response) {
+                    var end = GetCurrentTime();
+                    var diff = (end - start) / 1000;
+                    
+                    $('#play').hide();
+                    $('#time_diff').html(diff);
+                    $('#done').show();
+                });
+
+                //animate();
+                animate2();
+            };
+          
+            (function() {
+                var e = document.createElement('script'); e.async = true;
+                e.src = 'http://connect.facebook.net/en_US/all.js';
+                document.getElementById('fb-root').appendChild(e);
+            }());
+            
+            var animate2 = function() {
+                  var loop = function() {
+                      
+                      x = Math.round(400 * (Math.random()));
+                      y = Math.round(400 * (Math.random()));
+                      
+                      diff_x = x - $('#like').position().left;
+                      diff_y = y - $('#like').position().top;
+                     
+                      $('#like').animate({
+                              left: '+=' + diff_x,
+                              top: '+=' + diff_y
+                          }, 1000, function() {
+                              loop();
+                          }
+                      );
+                      
+                  }
+
+                  loop();
+            };
+            
+            var animate = function() {
+                var c = 0;
+                var loop = function(x,y) {
+                    var randomLeft = function(prev) {
+                        var r = Math.round(400 * Math.random());
+                        return { type: 'left', from: prev, to: r, delay: 50 };
+                    };
+
+                    var randomRight = function(prev) {
+                        return { type: 'right', from: prev, to: Math.round(400 * Math.random()), delay: 50 };
+                    };
+                    
+                    var a = randomLeft(x);
+                    var d = randomLeft(a.to);
+                    var b = randomRight(y);
+
+                    $('#like').css('left', x);
+                    console.log('point:');
+                    console.log($('#like').css('left'));
+                    console.log(a.from);
+                    console.log(a.to);
+                    /*if(c < 4)  $fx('#like').fxAdd(a).fxAdd(d).fxRun(function() {
+                        //$fx('#like').fxReset();
+                        console.log($('#like').css('left'));
+                        //$('#like').css('left', a.to + 'px');
+                        $fx('#like').fxAdd({ type: 'left', from: a.to, to: 200, delay: 50 }).fxRun(null, 1);
+                    }, 1, null);*/
+                    
+                    $fx('#like').fxAdd(a).fxAdd(d).fxRun(null, 1, null);
+                    c += 1;
+                    //$fx('#like').fxAdd(b).fxRun(null, 1, null);
+                }
+                
+                loop(10,10);
+            };
+            
+        </script>
+        
+    </body>
+
+</html>
