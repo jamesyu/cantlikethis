@@ -12,6 +12,7 @@
         <meta property="og:url" content="http://www.cantlikethis.com/"/>
         
         <script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+        <script src="jquery.cookie.js"></script>
         
         <style>
             body {
@@ -67,9 +68,12 @@
                 text-align: center;
             }
             
-            #done p {
+            #done h1 {
                 margin-top: 100px;
-                font-size: 50px;
+            }
+            
+            #done p {
+                font-size: 25px;
             }
         </style>
     </head>
@@ -90,7 +94,8 @@
             </div>
             
             <div class="container" style="display:none" id="done">
-                <p>It took you <span id="time_diff"></span> seconds.</p>
+                <h1>It took you <span id="time_diff"></span> seconds.</h1>
+                <p>Your best time is <span id="best"></span></p>
                 <p><a href="/">Refresh</a> to try again.</p>
             </div>
         </div>
@@ -106,18 +111,27 @@
         	}
 
             var start = GetCurrentTime();
+            
+            if(!$.cookie('best')) {
+                $.cookie('best', 99999);
+            }
         
             window.fbAsyncInit = function() {
                 FB.init({appId: '121798854535380', status: true, cookie: true,
                          xfbml: true});
-                         
+                
                          
                 FB.Event.subscribe('edge.create', function(response) {
                     var end = GetCurrentTime();
                     var diff = (end - start) / 1000;
                     
+                    if($.cookie('best') > diff) {
+                        $.cookie('best', diff);
+                    }
+                    
                     $('#play').hide();
                     $('#time_diff').html(diff);
+                    $('#best').html($.cookie('best'));
                     $('#done').show();
                 });
 
