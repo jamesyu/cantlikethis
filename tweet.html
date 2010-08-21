@@ -1,0 +1,254 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:fb="http://www.facebook.com/2008/fbml">
+    <head>
+        <script type="text/javascript">var _sf_startpt=(new Date()).getTime()</script>
+        <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+        <title>Can't Tweet It</title>
+
+        <script src="http://code.jquery.com/jquery-1.4.2.min.js"></script>
+        <script src="jquery.cookie.js"></script>
+        
+        <style>
+            body {
+                text-align: center;
+                font-family: Helvetica;
+                padding-top: 20px;
+                background: url(stripe.png);
+            }
+            
+            #page {
+                width: 600px;
+                background: #fff;
+                margin :auto;
+                padding: 25px;
+                border: 5px solid #7692CC;
+                -moz-box-shadow: 0px 0px 25px #ddd;
+                box-shadow: 0px 0px 25px #ddd;
+            }
+            
+            .like_header {
+                margin-bottom: 15px;
+            }
+            
+            .container {
+                margin: auto;
+                width: 600px;
+                height: 400px;
+                position: relative;
+                border: 5px solid #ddd;
+            }
+            
+            h1 {
+                background: #2C488D;
+                padding: 10px;
+                color: #fff;
+                width: 400px;
+                margin: auto;
+                -moz-border-radius: 10px;
+                -webkit-border-radius: 10px;
+            }
+            
+            h2, h3 {
+                color: #777;
+            }
+        
+            #like {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+            
+            #done {
+                text-align: center;
+            }
+            
+            #done h1 {
+                margin-top: 100px;
+            }
+            
+            #done p {
+                font-size: 25px;
+            }
+            
+            #start {
+                text-align: center;
+            }
+            
+            #start a {
+                background: #2C488D;
+                padding: 10px;
+                border: 4px solid #2C488D;
+                color: #fff;
+                width: 400px;
+                font-size: 35px;
+                margin: 95px auto 0 auto;
+                -moz-border-radius: 10px;
+                -webkit-border-radius: 10px;
+                display: block;
+                text-decoration: none;
+            }
+            
+            #start a:hover {
+                background: #fff;
+                color: #2C488D;
+            }
+            
+            #counter {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                font-size: 25px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div id="page">
+            <img src="like_small.gif" class="like_header">
+            
+            <h1>Can't Tweet It</h1>
+        
+            <h2>Try to beat this time: 3.2 seconds</h2>
+            <h3>Try to click the tweet button</h3>
+            
+            <div class="container" id="start">
+                <a href="#">Click to Start</a>
+            </div>
+        
+            <div class="container" id="play" style="display:none">
+                <div id="counter"></div>
+                <div id="like">
+                    <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://www.canttweetit.com/" data-text="I tweeted it! Can you do it?" data-count="horizontal" data-via="readshout">Tweet</a>
+                </div>
+                <script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+            </div>
+            
+            <div class="container" style="display:none" id="done">
+                <h1>It took you <span id="time_diff"></span> seconds.</h1>
+                <p>Your best time is <span id="best"></span></p>
+                <p><a href="/">Refresh</a> to try again.</p>
+            </div>
+        </div>
+        
+        <div id="fb-root"></div>
+        <script>
+        
+        
+        	function GetCurrentTime() {
+        	var my_current_timestamp;
+        		my_current_timestamp = new Date();		//stamp current date & time
+        		return my_current_timestamp.getTime();
+        	}
+
+            var start = GetCurrentTime();
+            
+            if(!$.cookie('best')) $.cookie('best', 99999);
+        
+            window.fbAsyncInit = function() {
+                FB.init({appId: '121798854535380', status: true, cookie: true, xfbml: true});
+                
+                FB.Event.subscribe('edge.create', function(response) {
+                    var end = GetCurrentTime();
+                    var diff = (end - start) / 1000;
+                    
+                    if($.cookie('best') > diff) {
+                        $.cookie('best', diff);
+                    }
+                    
+                    $('#play').hide();
+                    $('#time_diff').html(diff);
+                    $('#best').html($.cookie('best'));
+                    $('#done').show();
+                });
+
+                $('#start a').click(function(e) {
+                    e.stopPropagation();
+                    game();
+                    $('#start').hide();
+                    $('#play').show();
+                });
+            };
+          
+            (function() {
+                var e = document.createElement('script'); e.async = true;
+                e.src = 'http://connect.facebook.net/en_US/all.js';
+                document.getElementById('fb-root').appendChild(e);
+            }());
+            
+            var game = function() {
+                var loop = function() {
+                    x = Math.round(400 * (Math.random()));
+                    y = Math.round(400 * (Math.random()));
+                      
+                    diff_x = x - $('#like').position().left;
+                    diff_y = y - $('#like').position().top;
+                     
+                    $('#like').animate({
+                        left: '+=' + diff_x,
+                        top: '+=' + diff_y
+                    }, 1500, function() {
+                        loop();
+                    });
+                }
+                  
+                var startCounter = function() {
+                    var milisec = 0;
+                    var seconds = 0;
+                    $('#counter').html('0');
+
+                    function display() { 
+                        if (milisec >= 9) { 
+                            milisec=0;
+                            seconds+=1;
+                        } 
+                          
+                        milisec += 1;
+                          
+                        $('#counter').html(seconds+"."+milisec);
+                        setTimeout(display,100);
+                    } 
+                    display();
+                }
+                startCounter();
+                loop();
+            };
+        </script>
+        
+        <script type="text/javascript">
+        var _sf_async_config={uid:9705,domain:"cantlikethis.com"};
+        (function(){
+          function loadChartbeat() {
+            window._sf_endpt=(new Date()).getTime();
+            var e = document.createElement('script');
+            e.setAttribute('language', 'javascript');
+            e.setAttribute('type', 'text/javascript');
+            e.setAttribute('src',
+               (("https:" == document.location.protocol) ? "https://s3.amazonaws.com/" : "http://") +
+               "static.chartbeat.com/js/chartbeat.js");
+            document.body.appendChild(e);
+          }
+          var oldonload = window.onload;
+          window.onload = (typeof window.onload != 'function') ?
+             loadChartbeat : function() { oldonload(); loadChartbeat(); };
+        })();
+
+        </script>
+        
+        <script type="text/javascript">
+
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-18105296-1']);
+          _gaq.push(['_trackPageview']);
+
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+          })();
+
+        </script>
+        
+        
+        
+    </body>
+
+</html>
