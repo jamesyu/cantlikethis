@@ -75,6 +75,36 @@
             #done p {
                 font-size: 25px;
             }
+            
+            #start {
+                text-align: center;
+            }
+            
+            #start a {
+                background: #2C488D;
+                padding: 10px;
+                border: 4px solid #2C488D;
+                color: #fff;
+                width: 400px;
+                font-size: 35px;
+                margin: 95px auto 0 auto;
+                -moz-border-radius: 10px;
+                -webkit-border-radius: 10px;
+                display: block;
+                text-decoration: none;
+            }
+            
+            #start a:hover {
+                background: #fff;
+                color: #2C488D;
+            }
+            
+            #counter {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                font-size: 25px;
+            }
         </style>
     </head>
 
@@ -86,8 +116,13 @@
         
             <h2>Beat your friends best time: 3.2 seconds</h2>
             <h3>Try to click the like button</h3>
+            
+            <div class="container" id="start">
+                <a href="#">Click to Start</a>
+            </div>
         
-            <div class="container" id="play">
+            <div class="container" id="play" style="display:none">
+                <div id="counter"></div>
                 <div id="like">
                     <fb:like href="http://www.cantlikethis.com" layout="button_count"></fb:like>
                 </div>
@@ -112,15 +147,11 @@
 
             var start = GetCurrentTime();
             
-            if(!$.cookie('best')) {
-                $.cookie('best', 99999);
-            }
+            if(!$.cookie('best')) $.cookie('best', 99999);
         
             window.fbAsyncInit = function() {
-                FB.init({appId: '121798854535380', status: true, cookie: true,
-                         xfbml: true});
+                FB.init({appId: '121798854535380', status: true, cookie: true, xfbml: true});
                 
-                         
                 FB.Event.subscribe('edge.create', function(response) {
                     var end = GetCurrentTime();
                     var diff = (end - start) / 1000;
@@ -135,7 +166,12 @@
                     $('#done').show();
                 });
 
-                animate();
+                $('#start a').click(function(e) {
+                    e.stopPropagation();
+                    game();
+                    $('#start').hide();
+                    $('#play').show();
+                });
             };
           
             (function() {
@@ -144,31 +180,43 @@
                 document.getElementById('fb-root').appendChild(e);
             }());
             
-            var animate = function() {
-                  var loop = function() {
+            var game = function() {
+                var loop = function() {
+                    x = Math.round(400 * (Math.random()));
+                    y = Math.round(400 * (Math.random()));
                       
-                      x = Math.round(400 * (Math.random()));
-                      y = Math.round(400 * (Math.random()));
-                      
-                      diff_x = x - $('#like').position().left;
-                      diff_y = y - $('#like').position().top;
+                    diff_x = x - $('#like').position().left;
+                    diff_y = y - $('#like').position().top;
                      
-                      $('#like').animate({
-                              left: '+=' + diff_x,
-                              top: '+=' + diff_y
-                          }, 1500, function() {
-                              loop();
-                          }
-                      );
-                      
-                  }
+                    $('#like').animate({
+                        left: '+=' + diff_x,
+                        top: '+=' + diff_y
+                    }, 1500, function() {
+                        loop();
+                    });
+                }
+                  
+                var startCounter = function() {
+                    var milisec = 0;
+                    var seconds = 0;
+                    $('#counter').html('0');
 
-                  loop();
+                    function display() { 
+                        if (milisec >= 9) { 
+                            milisec=0;
+                            seconds+=1;
+                        } 
+                          
+                        milisec += 1;
+                          
+                        $('#counter').html(seconds+"."+milisec);
+                        setTimeout(display,100);
+                    } 
+                    display();
+                }
+                startCounter();
+                loop();
             };
-            
-            
-            
-            
         </script>
         
         <script type="text/javascript">
